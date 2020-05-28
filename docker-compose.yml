@@ -1,0 +1,108 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:5.0.3
+    command: redis-server
+
+  postgres:
+    image: postgres:10.4
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+
+  webserver:
+    image: airflow:v1-10-stable
+    restart: always
+    build: .
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+      - FERNET_KEY=V618s3UTpJj7JWyXTw8dlZOkjV6pKwLa_2hxWoGTC8U=
+      - AIRFLOW_BASE_URL=http://localhost:8080
+      - ENABLE_REMOTE_LOGGING=False
+      - STAGE=dev
+    volumes:
+        - ./airflow/dags:/usr/local/airflow/dags
+        - ./airflow/data/keyfile.json:/usr/local/airflow/data/keyfile.json
+    ports:
+        - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  flower:
+    image: airflow:v1-10-stable
+    restart: always
+    depends_on:
+      - redis
+      - webserver
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+      - STAGE=dev
+    ports:
+      - "5555:5555"
+    command: flower
+
+  scheduler:
+    image: airflow:v1-10-stable
+    restart: always
+    depends_on:
+      - webserver
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/data/keyfile.json:/usr/local/airflow/data/keyfile.json
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+      - FERNET_KEY=V618s3UTpJj7JWyXTw8dlZOkjV6pKwLa_2hxWoGTC8U=
+      - AIRFLOW_BASE_URL=http://localhost:8080
+      - ENABLE_REMOTE_LOGGING=False
+      - STAGE=dev
+    command: scheduler
+
+  worker:
+    image: airflow:v1-10-stable
+    restart: always
+    depends_on:
+      - webserver
+      - scheduler
+    volumes:
+      - ./airflow/dags:/usr/local/airflow/dags
+      - ./airflow/data/keyfile.json:/usr/local/airflow/data/keyfile.json
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+      - FERNET_KEY=V618s3UTpJj7JWyXTw8dlZOkjV6pKwLa_2hxWoGTC8U=
+      - AIRFLOW_BASE_URL=http://localhost:8080
+      - ENABLE_REMOTE_LOGGING=False
+      - STAGE=dev
+    command: worker

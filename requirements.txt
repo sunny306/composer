@@ -1,0 +1,5 @@
+google-api-core
+google-cloud-storage
+google-api-python-client
+pandas_gbq
+
