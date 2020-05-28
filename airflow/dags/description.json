@@ -1,0 +1,76 @@
+{
+  "matchweek": {
+    "schema": [
+      {
+        "name": "week",
+        "type": "INTEGER"
+      },
+      {
+        "name": "date",
+        "type": "DATE"
+      },
+      {
+        "name": "local_time",
+        "type": "TIME"
+      },
+      {
+        "name": "home_team",
+        "type": "STRING"
+      },
+      {
+        "name": "home_team_code",
+        "type": "STRING"
+      },
+      {
+        "name": "away_team",
+        "type": "STRING"
+      },
+      {
+        "name": "away_team_code",
+        "type": "STRING"
+      },
+      {
+        "name": "match",
+        "type": "STRING"
+      },
+      {
+        "name": "attendance",
+        "type": "INTEGER"
+      }
+    ],
+    "ext_schema": [{"name": "cdc_hash", "type": "STRING"}, {"name": "inserted_at", "type": "DATETIME"}]
+  },
+  "scorer": {
+    "schema": [
+      {
+        "name": "week",
+        "type": "INTEGER"
+      },
+      {
+        "name": "date",
+        "type": "DATE"
+      },
+      {
+        "name": "match",
+        "type": "STRING"
+      },
+      {
+        "name": "player",
+        "type": "STRING"
+      },
+      {
+        "name": "minute",
+        "type": "INTEGER"
+      },
+      {
+        "name": "extra_minute",
+        "type": "INTEGER"
+      },
+      {
+        "name": "scorer_team",
+        "type": "STRING"
+      }
+    ],
+    "ext_schema": [{"name": "cdc_hash", "type": "STRING"}, {"name": "inserted_at", "type": "DATETIME"}]
+  }
+}
